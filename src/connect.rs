@@ -1,4 +1,4 @@
-use openssl::rsa::{Padding, Rsa};
+// use openssl::rsa::{Padding, Rsa};
 
 use crate::binlog_client::BinlogClient;
 use crate::commands::auth_plugin_switch_command::AuthPluginSwitchCommand;
@@ -65,13 +65,13 @@ impl BinlogClient {
                 Ok(())
             }
             _ => {
-                self.authenticate_sha_256(
-                    channel,
-                    &packet,
-                    &handshake.scramble,
-                    seq_num + 1,
-                    use_ssl,
-                )?;
+                // self.authenticate_sha_256(
+                //     channel,
+                //     &packet,
+                //     &handshake.scramble,
+                //     seq_num + 1,
+                //     use_ssl,
+                // )?;
                 Ok(())
             }
         }
@@ -95,65 +95,65 @@ impl BinlogClient {
         let (packet, seq_num) = channel.read_packet()?;
         check_error_packet(&packet, "Authentication switch error.")?;
 
-        if switch_packet.auth_plugin_name == auth_plugin_names::CACHING_SHA2_PASSWORD {
-            self.authenticate_sha_256(
-                channel,
-                &packet,
-                &switch_packet.auth_plugin_data,
-                seq_num + 1,
-                use_ssl,
-            )?;
-        }
+        // if switch_packet.auth_plugin_name == auth_plugin_names::CACHING_SHA2_PASSWORD {
+        //     self.authenticate_sha_256(
+        //         channel,
+        //         &packet,
+        //         &switch_packet.auth_plugin_data,
+        //         seq_num + 1,
+        //         use_ssl,
+        //     )?;
+        // }
         Ok(())
     }
 
-    fn authenticate_sha_256(
-        &self,
-        channel: &mut PacketChannel,
-        packet: &[u8],
-        scramble: &String,
-        seq_num: u8,
-        use_ssl: bool,
-    ) -> Result<(), Error> {
-        // See https://mariadb.com/kb/en/caching_sha2_password-authentication-plugin/
-        // Success authentication.
-        if packet[0] == 0x01 && packet[1] == 0x03 {
-            return Ok(());
-        }
-
-        let mut password = self.options.password.as_bytes().to_vec();
-        password.push(NULL_TERMINATOR);
-
-        // Send clear password if ssl is used.
-        if use_ssl {
-            channel.write_packet(&password, seq_num)?;
-            let (packet, _seq_num) = channel.read_packet()?;
-            check_error_packet(&packet, "Sending clear password error.")?;
-            return Ok(());
-        }
-
-        // Request public key.
-        channel.write_packet(&[0x02], seq_num)?;
-        let (packet, seq_num) = channel.read_packet()?;
-        check_error_packet(&packet, "Requesting caching_sha2_password public key.")?;
-
-        // Extract public key.
-        let public_key = &packet[1..];
-        let encrypted_password = xor(&password, &scramble.as_bytes());
-
-        let rsa = Rsa::public_key_from_pem(public_key)?;
-        let mut encrypted_body = vec![0u8; rsa.size() as usize];
-        rsa.public_encrypt(
-            &encrypted_password,
-            &mut encrypted_body,
-            Padding::PKCS1_OAEP,
-        )?;
-
-        channel.write_packet(&encrypted_body, seq_num + 1)?;
-        let (packet, _seq_num) = channel.read_packet()?;
-        check_error_packet(&packet, "Authentication error.")?;
-        Ok(())
-    }
+    // fn authenticate_sha_256(
+    //     &self,
+    //     channel: &mut PacketChannel,
+    //     packet: &[u8],
+    //     scramble: &String,
+    //     seq_num: u8,
+    //     use_ssl: bool,
+    // ) -> Result<(), Error> {
+    //     // See https://mariadb.com/kb/en/caching_sha2_password-authentication-plugin/
+    //     // Success authentication.
+    //     if packet[0] == 0x01 && packet[1] == 0x03 {
+    //         return Ok(());
+    //     }
+    //
+    //     let mut password = self.options.password.as_bytes().to_vec();
+    //     password.push(NULL_TERMINATOR);
+    //
+    //     // Send clear password if ssl is used.
+    //     if use_ssl {
+    //         channel.write_packet(&password, seq_num)?;
+    //         let (packet, _seq_num) = channel.read_packet()?;
+    //         check_error_packet(&packet, "Sending clear password error.")?;
+    //         return Ok(());
+    //     }
+    //
+    //     // Request public key.
+    //     channel.write_packet(&[0x02], seq_num)?;
+    //     let (packet, seq_num) = channel.read_packet()?;
+    //     check_error_packet(&packet, "Requesting caching_sha2_password public key.")?;
+    //
+    //     // Extract public key.
+    //     let public_key = &packet[1..];
+    //     let encrypted_password = xor(&password, &scramble.as_bytes());
+    //
+    //     let rsa = Rsa::public_key_from_pem(public_key)?;
+    //     let mut encrypted_body = vec![0u8; rsa.size() as usize];
+    //     rsa.public_encrypt(
+    //         &encrypted_password,
+    //         &mut encrypted_body,
+    //         Padding::PKCS1_OAEP,
+    //     )?;
+    //
+    //     channel.write_packet(&encrypted_body, seq_num + 1)?;
+    //     let (packet, _seq_num) = channel.read_packet()?;
+    //     check_error_packet(&packet, "Authentication error.")?;
+    //     Ok(())
+    // }
 
     fn get_auth_plugin(&self, auth_plugin_name: &String) -> Result<AuthPlugin, Error> {
         if auth_plugin_name == auth_plugin_names::MY_SQL_NATIVE_PASSWORD {

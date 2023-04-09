@@ -1,6 +1,6 @@
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::io::{self, Read, Write};
-use std::net::TcpStream;
+use wasmedge_wasi_socket::*;
 
 use crate::constants::PACKET_HEADER_SIZE;
 use crate::replica_options::ReplicaOptions;
