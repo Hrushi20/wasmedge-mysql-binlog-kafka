@@ -1,11 +1,12 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
+use serde::{Deserialize, Serialize};
 
 use crate::errors::Error;
 
 /// Generated when an auto increment column or LAST_INSERT_ID() function are used.
 /// <a href="https://mariadb.com/kb/en/library/intvar_event/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct IntVarEvent {
     /// Gets type.
     /// 0x00 - Invalid value.

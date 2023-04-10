@@ -4,6 +4,7 @@ use crate::events::event_type::EventType;
 use crate::{constants, errors::Error};
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::{Cursor, Read, Seek, SeekFrom};
+use serde::{Deserialize, Serialize};
 
 const EVENT_TYPES_OFFSET: u8 = 2 + 50 + 4 + 1;
 
@@ -11,7 +12,7 @@ const EVENT_TYPES_OFFSET: u8 = 2 + 50 + 4 + 1;
 /// See <a href="https://mariadb.com/kb/en/library/format_description_event/">MariaDB docs</a>
 /// See <a href="https://dev.mysql.com/doc/internals/en/format-description-event.html">MySQL docs</a>
 /// See <a href="https://mariadb.com/kb/en/library/5-slave-registration/#events-transmission-after-com_binlog_dump">start events flow</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct FormatDescriptionEvent {
     /// Gets binary log format version. This should always be 4.
     pub binlog_version: u16,

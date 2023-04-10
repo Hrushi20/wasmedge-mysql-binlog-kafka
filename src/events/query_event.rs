@@ -1,10 +1,11 @@
 use crate::{errors::Error, extensions::read_string};
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::{Cursor, Read, Seek, SeekFrom};
+use serde::{Deserialize, Serialize};
 
 /// Represents sql statement in binary log.
 /// <a href="https://mariadb.com/kb/en/library/query_event/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct QueryEvent {
     /// Gets id of the thread that issued the statement.
     pub thread_id: u32,

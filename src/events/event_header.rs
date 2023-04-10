@@ -1,12 +1,13 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
+use serde::{Deserialize, Serialize};
 
 use crate::errors::Error;
 
 /// Binlog event header version 4. Header size is 19 bytes.
 /// See <a href="https://mariadb.com/kb/en/library/2-binlog-event-header/">MariaDB docs</a>
 /// See <a href="https://dev.mysql.com/doc/internals/en/binlog-version.html">MySQL docs</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct EventHeader {
     /// Provides creation time in seconds from Unix.
     pub timestamp: u32,

@@ -5,11 +5,12 @@ use crate::events::table_map_event::TableMapEvent;
 use crate::extensions::read_bitmap_little_endian;
 use std::collections::HashMap;
 use std::io::Cursor;
+use serde::{Deserialize, Serialize};
 
 /// Represents one or many updated rows in row based replication.
 /// Includes versions before and after update.
 /// <a href="https://mariadb.com/kb/en/library/rows_event_v1/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct UpdateRowsEvent {
     /// Gets id of the table where rows were updated
     pub table_id: u64,

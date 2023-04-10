@@ -2,9 +2,10 @@ use crate::errors::Error;
 use crate::providers::mariadb::gtid::gtid::Gtid;
 use std::collections::HashSet;
 use std::fmt;
+use serde::{Deserialize, Serialize};
 
 /// Represents GtidList from MariaDB.
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct GtidList {
     /// Gets a list of Gtids per each domain.
     pub gtids: Vec<Gtid>,

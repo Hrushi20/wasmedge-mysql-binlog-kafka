@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use crate::events::format_description_event::FormatDescriptionEvent;
 use crate::events::heartbeat_event::HeartbeatEvent;
 use crate::events::intvar_event::IntVarEvent;
@@ -15,7 +16,7 @@ use crate::providers::mysql::events::gtid_event::GtidEvent as MySqlGtidEvent;
 use crate::providers::mysql::events::prev_gtids_event::PreviousGtidsEvent;
 
 /// Represents a binlog event.
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub enum BinlogEvent {
     UnknownEvent,
     DeleteRowsEvent(DeleteRowsEvent),

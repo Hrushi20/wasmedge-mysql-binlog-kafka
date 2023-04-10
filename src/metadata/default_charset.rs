@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 /// Represents charsets of character columns.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DefaultCharset {
     /// Gets the most used charset collation.
     pub default_charset_collation: u32,

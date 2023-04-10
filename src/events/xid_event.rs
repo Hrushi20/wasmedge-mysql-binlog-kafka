@@ -1,11 +1,12 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
+use serde::{Deserialize, Serialize};
 
 use crate::errors::Error;
 
 /// Represents a transaction commit event.
 /// <a href="https://mariadb.com/kb/en/library/xid_event/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct XidEvent {
     /// Gets the XID transaction number
     pub xid: u64,

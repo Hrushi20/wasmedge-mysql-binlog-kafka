@@ -4,10 +4,11 @@ use crate::extensions::{read_bitmap_little_endian, read_len_enc_num, read_string
 use crate::metadata::table_metadata::TableMetadata;
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt};
 use std::io::{Cursor, Read, Seek, SeekFrom};
+use serde::{Deserialize, Serialize};
 
 /// The event has table defition for row events.
 /// <a href="https://mariadb.com/kb/en/library/table_map_event/">See more</a>
-#[derive(Clone, Debug)]
+#[derive(Debug,Serialize,Deserialize,Clone)]
 pub struct TableMapEvent {
     /// Gets id of the changed table
     pub table_id: u64,

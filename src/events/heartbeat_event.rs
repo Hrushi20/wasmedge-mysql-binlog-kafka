@@ -1,10 +1,11 @@
 use std::io::{Cursor, Read};
+use serde::{Deserialize, Serialize};
 
 use crate::errors::Error;
 
 /// The event is sent from master to the client for keep alive feature.
 /// <a href="https://mariadb.com/kb/en/library/heartbeat_log_event/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct HeartbeatEvent {
     /// Gets current master binlog filename
     pub binlog_filename: String,

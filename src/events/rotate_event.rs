@@ -1,12 +1,13 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::{Cursor, Read};
+use serde::{Deserialize, Serialize};
 
 use crate::errors::Error;
 
 /// Last event in a binlog file which points to next binlog file.
 /// Fake version is also returned when replication is started.
 /// <a href="https://mariadb.com/kb/en/library/rotate_event/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct RotateEvent {
     /// Gets next binlog filename
     pub binlog_filename: String,

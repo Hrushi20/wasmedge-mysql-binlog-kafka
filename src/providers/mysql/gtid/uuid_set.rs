@@ -3,9 +3,10 @@ use crate::providers::mysql::gtid::gtid::Gtid;
 use crate::providers::mysql::gtid::interval::Interval;
 use crate::providers::mysql::gtid::uuid::Uuid;
 use std::fmt;
+use serde::{Deserialize, Serialize};
 
 /// Represents replication state for a specific server.
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct UuidSet {
     /// Gets server uuid of the UuidSet.
     pub source_id: Uuid,

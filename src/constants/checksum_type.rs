@@ -1,7 +1,8 @@
 use crate::errors::Error;
+use serde::{Deserialize, Serialize};
 
 /// Checksum type used in a binlog file.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug,Serialize,Deserialize)]
 pub enum ChecksumType {
     /// Checksum is disabled.
     None = 0,

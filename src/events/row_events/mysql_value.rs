@@ -1,11 +1,13 @@
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug,Serialize,Deserialize)]
 pub struct Date {
     pub year: u16,
     pub month: u8,
     pub day: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct Time {
     pub hour: i16, // Signed value from -838 to 838
     pub minute: u8,
@@ -13,7 +15,7 @@ pub struct Time {
     pub millis: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct DateTime {
     pub year: u16,
     pub month: u8,
@@ -24,7 +26,7 @@ pub struct DateTime {
     pub millis: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub enum MySqlValue {
     TinyInt(u8),
     SmallInt(u16),

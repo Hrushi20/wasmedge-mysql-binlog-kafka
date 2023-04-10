@@ -5,10 +5,11 @@ use crate::events::table_map_event::TableMapEvent;
 use crate::extensions::read_bitmap_little_endian;
 use std::collections::HashMap;
 use std::io::Cursor;
+use serde::{Deserialize, Serialize};
 
 /// Represents one or many deleted rows in row based replication.
 /// <a href="https://mariadb.com/kb/en/library/rows_event_v1/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct DeleteRowsEvent {
     /// Gets id of the table where rows were deleted
     pub table_id: u64,

@@ -2,10 +2,11 @@ use crate::providers::mysql::gtid::uuid::Uuid;
 use crate::{errors::Error, providers::mysql::gtid::gtid::Gtid};
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::{Cursor, Read};
+use serde::{Deserialize, Serialize};
 
 /// Marks start of a new event group(transaction).
 /// <a href="https://mariadb.com/kb/en/gtid_event/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct GtidEvent {
     /// Gets Global Transaction ID of the event group.
     pub gtid: Gtid,

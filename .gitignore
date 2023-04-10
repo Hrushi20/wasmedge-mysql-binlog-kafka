@@ -10,3 +10,7 @@ Cargo.lock
 **/*.rs.bk
 
 .idea
+
+mysql
+mysql-binlog-kafka/target
+mysql-binlog-kafka/Cargo.lock

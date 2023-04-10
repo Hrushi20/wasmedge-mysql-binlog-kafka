@@ -2,10 +2,11 @@ use crate::providers::mariadb::gtid::gtid_list::GtidList;
 use crate::{errors::Error, providers::mariadb::gtid::gtid::Gtid};
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
+use serde::{Deserialize, Serialize};
 
 /// Shows current replication state with list of last gtid for each replication domain.
 /// <a href="https://mariadb.com/kb/en/gtid_list_event/">See more</a>
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct GtidListEvent {
     /// Gets a list of Gtid that represents current replication state
     pub gtid_list: GtidList,

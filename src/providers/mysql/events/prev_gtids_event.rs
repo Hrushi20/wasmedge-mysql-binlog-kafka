@@ -4,9 +4,10 @@ use crate::providers::mysql::gtid::uuid_set::UuidSet;
 use crate::{errors::Error, providers::mysql::gtid::gtid_set::GtidSet};
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::{Cursor, Read};
+use serde::{Deserialize, Serialize};
 
 /// Used to record the gtid_executed of previous binlog files.
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct PreviousGtidsEvent {
     /// Gets GtidSet of previous files.
     pub gtid_set: GtidSet,

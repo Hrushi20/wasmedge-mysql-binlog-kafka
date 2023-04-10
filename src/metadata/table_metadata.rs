@@ -5,10 +5,11 @@ use crate::metadata::default_charset::DefaultCharset;
 use crate::metadata::metadata_type::MetadataType;
 use byteorder::ReadBytesExt;
 use std::io::{self, Cursor, Read};
+use serde::{Deserialize, Serialize};
 
 /// Contains metadata for table columns.
 /// <a href="https://dev.mysql.com/doc/dev/mysql-server/latest/classbinary__log_1_1Table__map__event.html">See more</a>
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TableMetadata {
     /// Gets signedness of numeric colums.
     pub signedness: Option<Vec<bool>>,

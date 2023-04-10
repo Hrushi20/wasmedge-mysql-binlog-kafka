@@ -1,7 +1,8 @@
 use std::fmt;
+use serde::{Deserialize, Serialize};
 
 /// Represents contiguous transaction interval in GtidSet.
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct Interval {
     /// Gets first transaction id in the interval.
     pub start: u64,

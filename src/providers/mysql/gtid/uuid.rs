@@ -1,9 +1,10 @@
 use std::fmt;
+use serde::{Deserialize, Serialize};
 
 use crate::errors::Error;
 
 /// Represents Uuid with little-endian bytes order unlike big-endian Guid.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Uuid {
     pub data: [u8; 16],
     pub uuid: String,
