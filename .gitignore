@@ -14,3 +14,4 @@ Cargo.lock
 mysql
 mysql-binlog-kafka/target
 mysql-binlog-kafka/Cargo.lock
+kafka

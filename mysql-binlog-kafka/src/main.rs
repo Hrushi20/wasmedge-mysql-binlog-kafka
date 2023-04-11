@@ -4,8 +4,58 @@ use mysql_cdc::providers::mariadb::gtid::gtid_list::GtidList;
 use mysql_cdc::providers::mysql::gtid::gtid_set::GtidSet;
 use mysql_cdc::replica_options::ReplicaOptions;
 use mysql_cdc::ssl_mode::SslMode;
+use mysql_cdc::events::binlog_event::BinlogEvent;
+use mysql_cdc::events::event_header::EventHeader;
 
-fn main() -> Result<(),mysql_cdc::errors::Error> {
+use rskafka::{
+    client::{
+        ClientBuilder,
+        partition::{Compression, UnknownTopicHandling},
+    },
+    record::Record,
+};
+use chrono::{ TimeZone, Utc };
+
+async fn send_events_to_kafka(event_header:&EventHeader, event:&BinlogEvent){
+    let connection = "localhost:9092".to_owned();
+    let client = ClientBuilder::new(vec![connection]).build().await.expect("Couldn't connect to kafka");
+    let topic = "sql_binlog_events";
+    let controller_client = client.controller_client().unwrap();
+
+    let event_binary = serde_json::to_vec(event).unwrap();
+    // controller_client.create_topic(
+    //     topic,
+    //     2,      // partitions
+    //     1,      // replication factor
+    //     5_000,  // timeout (ms)
+    // ).await.unwrap();
+    //
+    // // get a partition-bound client
+    // let partition_client = client
+    //     .partition_client(
+    //         topic.to_owned(),
+    //         0,  // partition
+    //         UnknownTopicHandling::Retry,
+    //     )
+    //     .await
+    //     .unwrap();
+    //
+    // let
+    // // produce some data
+    // let record = Record {
+    //     key: None,
+    //     value: Some(event.),
+    //     headers: BTreeMap::from([
+    //         ("foo".to_owned(), b"bar".to_vec()),
+    //     ]),
+    //     timestamp: Utc.timestamp_millis(42),
+    // };
+    // partition_client.produce(vec![record], Compression::default()).await.unwrap();
+
+}
+
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> Result<(),mysql_cdc::errors::Error> {
     // Start replication from MariaDB GTID
     let _options = BinlogOptions::from_mariadb_gtid(GtidList::parse("0-1-270")?);
 
@@ -39,8 +89,8 @@ fn main() -> Result<(),mysql_cdc::errors::Error> {
     for result in client.replicate()? {
         let (header, event) = result?;
         println!("Header: {:#?}", header);
-        println!("Event: {:#?}", event);
-        // let s = serde_json::to_string(&event).unwrap();
+        // println!("Event: {:#?}", event);
+        send_events_to_kafka(&header,&event).await;
 
         // After you processed the event, you need to update replication position
         client.commit(&header, &event);
