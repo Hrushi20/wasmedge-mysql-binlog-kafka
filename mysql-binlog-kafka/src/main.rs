@@ -7,6 +7,7 @@ use mysql_cdc::ssl_mode::SslMode;
 use mysql_cdc::events::binlog_event::BinlogEvent;
 use mysql_cdc::events::event_header::EventHeader;
 
+use std::collections::BTreeMap;
 use rskafka::{
     client::{
         ClientBuilder,
@@ -15,42 +16,58 @@ use rskafka::{
     record::Record,
 };
 use chrono::{ TimeZone, Utc };
+use rskafka::client::Client;
+use rskafka::client::partition::PartitionClient;
 
-async fn send_events_to_kafka(event_header:&EventHeader, event:&BinlogEvent){
-    let connection = "localhost:9092".to_owned();
-    let client = ClientBuilder::new(vec![connection]).build().await.expect("Couldn't connect to kafka");
-    let topic = "sql_binlog_events";
-    let controller_client = client.controller_client().unwrap();
+struct KafkaProducer {
+    client: Client,
+    topic: String
+}
 
-    let event_binary = serde_json::to_vec(event).unwrap();
-    // controller_client.create_topic(
-    //     topic,
-    //     2,      // partitions
-    //     1,      // replication factor
-    //     5_000,  // timeout (ms)
-    // ).await.unwrap();
-    //
-    // // get a partition-bound client
-    // let partition_client = client
-    //     .partition_client(
-    //         topic.to_owned(),
-    //         0,  // partition
-    //         UnknownTopicHandling::Retry,
-    //     )
-    //     .await
-    //     .unwrap();
-    //
-    // let
-    // // produce some data
-    // let record = Record {
-    //     key: None,
-    //     value: Some(event.),
-    //     headers: BTreeMap::from([
-    //         ("foo".to_owned(), b"bar".to_vec()),
-    //     ]),
-    //     timestamp: Utc.timestamp_millis(42),
-    // };
-    // partition_client.produce(vec![record], Compression::default()).await.unwrap();
+impl KafkaProducer {
+
+    async fn connect(url: String) -> Self {
+       KafkaProducer{
+           client: ClientBuilder::new(vec![url]).build().await.expect("Couldn't connect to kafka"),
+           topic: "".to_string()
+       }
+    }
+
+    async fn create_topic(&mut self, topic: &str){
+        // let controller_client = self.client.controller_client().unwrap();
+        // controller_client.create_topic(
+        //     topic,
+        //     2,      // partitions
+        //     1,      // replication factor
+        //     5_000,  // timeout (ms)
+        // ).await.unwrap();
+    }
+
+    async fn partition_client(&self) -> PartitionClient {
+        self.client
+            .partition_client(
+                self.topic.to_owned(),
+                0,  // partition
+                UnknownTopicHandling::Retry,
+            )
+            .await
+            .unwrap()
+    }
+
+    fn create_record() -> Record{
+        Record {
+            key: None,
+            value: None,
+            headers: BTreeMap::from([
+                ("foo".to_owned(), b"bar".to_vec()),
+            ]),
+            timestamp: Utc.timestamp_millis(42),
+        }
+    }
+
+    async fn produce(partitionClient: PartitionClient, record: Record){
+        partitionClient.produce(vec![record],Compression::default()).await.unwrap();
+    }
 
 }
 
@@ -86,11 +103,12 @@ async fn main() -> Result<(),mysql_cdc::errors::Error> {
 
     let mut client = BinlogClient::new(options);
 
+    let kakfa_producer = KafkaProducer::connect("localhost:9092".to_owned()).await;
+
     for result in client.replicate()? {
         let (header, event) = result?;
         println!("Header: {:#?}", header);
         // println!("Event: {:#?}", event);
-        send_events_to_kafka(&header,&event).await;
 
         // After you processed the event, you need to update replication position
         client.commit(&header, &event);
