@@ -11,7 +11,7 @@ Cargo.lock
 
 .idea
 
-mysql
+
 mysql-binlog-kafka/target
 mysql-binlog-kafka/Cargo.lock
-kafka
+docker_container_config

@@ -1,3 +1,4 @@
+version: "3.9"
 services:
   redpanda:
     image: docker.redpanda.com/vectorized/redpanda:v22.2.2
@@ -17,4 +18,23 @@ services:
       - 9644:9644
       - 29092:29092
     volumes:
-      - ./kafka:/app
+      - ./docker_container_config/kafka:/app
+
+  mysql5.7:
+    image: mysql:5.7
+    container_name: mysql5.7
+    command: 
+      --server-id=1
+      --log-bin=mysql-bin
+      --max-binlog-size=4096
+      --binlog-format=MIXED
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - ./docker_container_config/my.cnf:/root/.my.cnf:ro
+      - ./docker_container_config/mysql5.7/conf.d:/etc/mysql/conf.d:ro
+      - ./docker_container_config/mysql5.7/logs:/var/log/mysql:rw
+      - ./docker_container_config/mysql5.7/initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./docker_container_config/auto-generate:/auto-generate:rw
