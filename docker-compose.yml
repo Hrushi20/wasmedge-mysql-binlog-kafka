@@ -1,25 +1,5 @@
 version: "3.9"
 services:
-  redpanda:
-    image: docker.redpanda.com/vectorized/redpanda:v22.2.2
-    command:
-      - redpanda start
-      - --smp 1
-      - --overprovisioned
-      - --node-id 0
-      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
-      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://redpanda:9092
-      - --pandaproxy-addr 0.0.0.0:8082
-      - --advertise-pandaproxy-addr localhost:8082
-    ports:
-      - 8081:8081
-      - 8082:8082
-      - 9092:9092
-      - 9644:9644
-      - 29092:29092
-    volumes:
-      - ./docker_container_config/kafka:/app
-
   mysql5.7:
     image: mysql:5.7
     container_name: mysql5.7
@@ -28,6 +8,15 @@ services:
       --log-bin=mysql-bin
       --max-binlog-size=4096
       --binlog-format=MIXED
+      --sync-binlog=1
+      --log-slave-updates=ON
+      --gtid-mode=ON
+      --enforce-gtid-consistency=ON
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=1000
+      --read-only=OFF
+      --binlog-rows-query-log-events=ON
     ports:
       - 3306:3306
     environment:
@@ -38,3 +27,16 @@ services:
       - ./docker_container_config/mysql5.7/logs:/var/log/mysql:rw
       - ./docker_container_config/mysql5.7/initdb.d:/docker-entrypoint-initdb.d:ro
       - ./docker_container_config/auto-generate:/auto-generate:rw
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
