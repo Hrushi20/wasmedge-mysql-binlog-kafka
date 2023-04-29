@@ -16,7 +16,7 @@ wasmedge target/wasm32-wasi/debug/mysql-binlog-kafka.wasm
 
 ### Open a new terminal and run the insert sql query using wasmedge
 ```
-wasmedge --env "DATABASE_URL=mysql://root:password@127.0.0.1:3306/test" sql-commands-test-wasm/insert.wasm
+wasmedge --env "DATABASE_URL=mysql://root:password@127.0.0.1:3306/mysql" sql-commands-test-wasm/insert.wasm
 ```
 * `insert.wasm` file is compiled to wasm using `src/sql-commands-test-wasm/insert.rs` file. 
 * The password for root user is present in `docker-compose.yml` file.
