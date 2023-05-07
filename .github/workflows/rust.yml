@@ -45,7 +45,10 @@ jobs:
         curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- --version=$VERSION -p /usr/local  
       
     - name: Build
-      run: cargo build --target=wasm32-wasi --verbose
+      run: |
+        cd mysql-binlog-kakfa
+        cargo build --target=wasm32-wasi --release
+        nohup wasmedge  --env "SQL_USERNAME=root" --env "SQL_PASSWORD=root" --env "SQL_PORT=3306" --env "SQL_HOSTNAME=localhost" --env "SQL_DATABASE=mysql" --env "KAFKA_URL=localhost:9092" target/wasm32-wasi/release/mysql-binlog-kafka.wasm
       
     - name: Run tests
       run: cargo build --target=wasm32-wasi --verbose
