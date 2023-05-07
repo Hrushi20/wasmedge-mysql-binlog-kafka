@@ -97,9 +97,18 @@ async fn main() -> Result<(),mysql_cdc::errors::Error> {
     // Note that binlog files by default have expiration time and deleted.
     // let options = BinlogOptions::from_start();
 
+    let username = std::env::var("SQL_USERNAME").unwrap();
+    let password = std::env::var("SQL_PASSWORD").unwrap();
+    let mysql_port = std::env::var("SQL_PORT").unwrap();
+    let mysql_hostname = std::env::var("SQL_HOSTNAME").unwrap();
+
+    let mysql_database = std::env::var("SQL_DATABASE").unwrap();
     let options = ReplicaOptions {
-        username: String::from("root"),
-        password: String::from("password"),
+        username,
+        password,
+        port: mysql_port.parse::<u16>().unwrap(),
+        hostname: mysql_hostname,
+        database: Some(mysql_database),
         blocking: true,
         ssl_mode: SslMode::Disabled,
         binlog: options,
@@ -108,7 +117,8 @@ async fn main() -> Result<(),mysql_cdc::errors::Error> {
 
     let mut client = BinlogClient::new(options);
 
-    let mut kafka_producer = KafkaProducer::connect("localhost:9092".to_string()).await;
+    let kafka_url = std::env::var("KAFKA_URL").unwrap();
+    let mut kafka_producer = KafkaProducer::connect(kafka_url).await;
     kafka_producer.create_topic("mysql_binlog_events").await;
     let partitionClient = kafka_producer.get_partition_client(0).await.unwrap();
     let mut partition_offset = partitionClient.get_offset(OffsetAt::Latest).await.unwrap();
