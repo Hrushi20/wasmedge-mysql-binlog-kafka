@@ -38,7 +38,9 @@ jobs:
       run: |
         cd mysql-binlog-kafka
         cargo build --target=wasm32-wasi --release
-        nohup wasmedge  --env "SQL_USERNAME=root" --env "SQL_PASSWORD=password" --env "SQL_PORT=3306" --env "SQL_HOSTNAME=localhost" --env "SQL_DATABASE=mysql" --env "KAFKA_URL=localhost:9092" target/wasm32-wasi/release/mysql-binlog-kafka.wasm
+        nohup wasmedge  --env "SQL_USERNAME=root" --env "SQL_PASSWORD=password" --env "SQL_PORT=3306" --env "SQL_HOSTNAME=localhost" --env "SQL_DATABASE=mysql" --env "KAFKA_URL=localhost:9092" target/wasm32-wasi/release/mysql-binlog-kafka.wasm  &
+        echo $! > wasmedge.pid
+        sleep 15
       
     - name: Run tests
       run: |
