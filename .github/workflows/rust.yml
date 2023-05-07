@@ -46,3 +46,4 @@ jobs:
       run: |
         cd mysql-binlog-kafka
         wasmedge --env "DATABASE_URL=mysql://root:password@127.0.0.1:3306/mysql" sql-commands-test-wasm/insert.wasm
+        cat nohup.out | grep "INSERT INTO payment (customer_id, amount, account_name)" && echo "Query executed successfully" || exit 1 
