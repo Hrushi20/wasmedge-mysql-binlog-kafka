@@ -1,0 +1,62 @@
+version: "3.9"
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    command: 
+      --server-id=1
+      --log-bin=mysql-bin
+      --max-binlog-size=4096
+      --binlog-format=MIXED
+      --sync-binlog=1
+      --log-slave-updates=ON
+      --gtid-mode=ON
+      --enforce-gtid-consistency=ON
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=1000
+      --read-only=OFF
+      --binlog-rows-query-log-events=ON
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - ./docker_container_config/my.cnf:/root/.my.cnf:ro
+      - ./docker_container_config/mysql5.7/conf.d:/etc/mysql/conf.d:ro
+      - ./docker_container_config/mysql5.7/logs:/var/log/mysql:rw
+      - ./docker_container_config/mysql5.7/initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./docker_container_config/auto-generate:/auto-generate:rw
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    container_name: "kafka"
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  wasmedge_binlog_kafka:
+    container_name: "wasmedge_binlog_kafka"
+    image: hrushi20/mysql-binlog-kafka 
+    platform: wasi/wasm
+    build:
+      context: .
+    environment:
+      SQL_USERNAME: root 
+      SQL_PASSWORD: password 
+      SQL_PORT: 3306 
+      SQL_HOSTNAME: "mysql"
+      SQL_DATABASE: "mysql"
+      KAFKA_URL: "localhost:9092"
+    runtime: io.containerd.wasmedge.v1
+    depends_on:
+      - mysql
+      - kafka
+      - zookeeper
