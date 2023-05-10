@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.24"
-mysql_cdc = { path="../" }
+mysql_cdc = { path="../mysql_cdc" }
 rskafka_wasi = "0.3.1"
 serde_json = "1.0.95"
 tokio_wasi = {version = '1.21', features = ["rt", "macros"]}
