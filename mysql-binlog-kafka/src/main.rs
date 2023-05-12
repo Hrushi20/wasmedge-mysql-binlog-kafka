@@ -8,6 +8,7 @@ use mysql_cdc::events::binlog_event::BinlogEvent;
 use mysql_cdc::events::event_header::EventHeader;
 
 use std::collections::BTreeMap;
+use std::{thread, time::Duration};
 use rskafka::{
     client::{
         ClientBuilder,
@@ -78,6 +79,12 @@ impl KafkaProducer {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(),mysql_cdc::errors::Error> {
+
+    let sleep_time:u64 = std::env::var("SLEEP_TIME").unwrap().parse().unwrap();
+
+    thread::sleep(Duration::from_millis(sleep_time));
+    println!("Thread started");
+
     // // Start replication from MariaDB GTID
     // let _options = BinlogOptions::from_mariadb_gtid(GtidList::parse("0-1-270")?);
     //
@@ -116,9 +123,11 @@ async fn main() -> Result<(),mysql_cdc::errors::Error> {
     };
 
     let mut client = BinlogClient::new(options);
+    println!("Connected to mysql database");
 
     let kafka_url = std::env::var("KAFKA_URL").unwrap();
     let mut kafka_producer = KafkaProducer::connect(kafka_url).await;
+    println!("Connected to kafka server");
     kafka_producer.create_topic("mysql_binlog_events").await;
     let partitionClient = kafka_producer.get_partition_client(0).await.unwrap();
     let mut partition_offset = partitionClient.get_offset(OffsetAt::Latest).await.unwrap();
